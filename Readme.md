@@ -17,7 +17,7 @@
 
 <p align="center">
   <strong>Live Avatar</strong> achieves high-fidelity, low-latency, and infinite-duration avatar generation.<br>
-  <em>Compatible with NVIDIA RTX 4090 & H100 GPUs.</em>
+  <em>Compatible with NVIDIA RTX 4090 & H800 GPUs.</em>
 </p>
 
 </div>
