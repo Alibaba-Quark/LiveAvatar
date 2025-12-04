@@ -32,7 +32,7 @@
 </p>
 
 <!-- Badges -->
-<a href="https://arxiv.org/abs/YOUR_PAPER_ID"><img src="https://img.shields.io/badge/arXiv-25XX.XXXXX-b31b1b.svg?style=for-the-badge" alt="arXiv"></a> <a href="https://huggingface.co/YOUR_ORG/YOUR_MODEL"><img src="https://img.shields.io/badge/Hugging%20Face-Model-ffbd45?style=for-the-badge&logo=huggingface&logoColor=white" alt="HuggingFace"></a> <a href="https://github.com/YOUR_USERNAME/LiveAvatar"><img src="https://img.shields.io/badge/Github-Code-black?style=for-the-badge&logo=github" alt="Github"></a> <a href="YOUR_PROJECT_PAGE_URL"><img src="https://img.shields.io/badge/Project-Page-blue?style=for-the-badge&logo=googlechrome&logoColor=white" alt="Project Page"></a>
+<a href="https://arxiv.org/abs/YOUR_PAPER_ID"><img src="https://img.shields.io/badge/arXiv-25XX.XXXXX-b31b1b.svg?style=for-the-badge" alt="arXiv"></a> <a href="https://huggingface.co/Quark-Vision/Live-Avatar"><img src="https://img.shields.io/badge/Hugging%20Face-Model-ffbd45?style=for-the-badge&logo=huggingface&logoColor=white" alt="HuggingFace"></a> <a href="https://github.com/Alibaba-Quark/LiveAvatar"><img src="https://img.shields.io/badge/Github-Code-black?style=for-the-badge&logo=github" alt="Github"></a> <a href="https://liveavatar.github.io/"><img src="https://img.shields.io/badge/Project-Page-blue?style=for-the-badge&logo=googlechrome&logoColor=white" alt="Project Page"></a>
 
 </div>
 
