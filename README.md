@@ -49,15 +49,15 @@
 
 <!-- We propose **MultiTalk** , a novel framework for audio-driven multi-person conversational video generation. Given a multi-stream audio input, a reference image and a prompt, MultiTalk generates a video containing interactions following the prompt, with consistent lip motions aligned with the audio. -->
 
-> - ⚡ **​​Real-time Streaming Interaction**​​ - Achieve 20 FPS real-time streaming with low latency
-> - ♾️ ​​**​​Infinite-length Autoregressive Generation**​​​​ - Support 10,000+ second continuous video generation
+> - ⚡ **​​Real-time Streaming Interaction**​​ - Achieve **20** FPS real-time streaming with low latency
+> - ♾️ ​​**​​Infinite-length Autoregressive Generation**​​​​ - Support **10,000+** second continuous video generation
 > - 🎨 ​​**​​Generalization Performances**​​​​ - Strong generalization across cartoon characters, singing, and diverse scenarios 
 
 
 ---
 ## 📰 News
-- **[2025.12.02]** The code will be open source in early December.
-- **[2025.12.02]** We release Paper and demo page Website.
+- **[2025.12.04]** The code will be open source in **early December**.
+- **[2025.12.04]** We release Paper and demo page Website.
 <!-- - **[2025/09]** Paper accepted to **CVPR/ICCV 2025**. -->
 
 ---
@@ -82,6 +82,7 @@
   - ⬜ Timestep-forcing pipeline parallelism
   - ⬜ SVD quantization
   - ⬜ SageAttention integration
+- ⬜ Highly optimized training code supporting DMD training on 8x A100 GPUs
 - ⬜ Run with very low VRAM
 - ⬜ TTS integration
 - ⬜ ComfyUI support
