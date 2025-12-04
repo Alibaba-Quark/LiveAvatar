@@ -38,17 +38,11 @@
 
 > **TL;DR:** **Live Avatar** is an algorithm–system co-designed framework that enables real-time, streaming, infinite-length interactive avatar video generation. Powered by a **14B-parameter** diffusion model, it achieves **20 FPS** on **5×H800** GPUs with **4-step** sampling and supports **Block-wise Autoregressive** processing for **10,000+** second streaming videos.
 
-<p align="center">
-  <iframe
-    width="800"
-    height="450"
-    src="https://www.youtube.com/embed/srbsGlLNpAc?autoplay=1&mute=1&loop=1&playlist=srbsGlLNpAc&controls=1&rel=0"
-    title="Live Avatar Demo"
-    frameborder="0"
-    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-    allowfullscreen>
-  </iframe>
-</p>
+<div align="center">
+
+[![Watch the video](assets/demo.png)](https://www.youtube.com/watch?v=srbsGlLNpAc)
+
+</div>
 
 ---
 ## ✨ Highlights
