@@ -608,7 +608,36 @@ class WanS2V:
             })
 
         self.kv_cache1 = kv_cache1  # always store the clean cache
-    
+
+    def _sync_kv_cache(self, src_rank, num_gpus_dit):
+        """
+        Broadcast KV cache from src_rank to all other DiT GPUs.
+
+        Called after each denoising step to ensure all GPUs have consistent
+        temporal attention state for modulo cycling.
+        """
+        if self.kv_cache1 is None:
+            return
+
+        my_rank = dist.get_rank()
+        if my_rank >= num_gpus_dit:
+            return  # VAE rank doesn't participate
+
+        for layer_cache in self.kv_cache1:
+            for key in ["k", "v", "cond_k", "cond_v", "cond_end"]:
+                tensor = layer_cache[key]
+
+                if my_rank == src_rank:
+                    # Source: send to all other DiT GPUs
+                    for dst in range(num_gpus_dit):
+                        if dst != src_rank:
+                            dist.send(tensor.contiguous(), dst)
+                else:
+                    # Destination: receive from source
+                    recv_buf = torch.empty_like(tensor)
+                    dist.recv(recv_buf, src_rank)
+                    tensor.copy_(recv_buf)
+
     def _move_kv_cache_to_working_gpu(self,moved_id, gpu_id=0):
         """
         Move the KV cache to the working GPU.
@@ -1096,6 +1125,9 @@ class WanS2V:
                             return_dict=False,
                             generator=seed_g)[0]
                         block_latents = temp_x0.squeeze(0) #[16,num_frames_per_block,h,w]
+
+                        # Sync KV cache after each step for modulo cycling
+                        self._sync_kv_cache(i % num_gpus_dit, num_gpus_dit)
 
                         # Dynamic target: last rank in cycle sends to rank 0, unless it's the final step
                         is_last_in_cycle = (my_rank == num_gpus_dit - 1)
