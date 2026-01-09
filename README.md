@@ -39,7 +39,7 @@
 
 </div>
 
-> **TL;DR:** **Live Avatar** is an algorithm–system co-designed framework that enables real-time, streaming, infinite-length interactive avatar video generation. Powered by a **14B-parameter** diffusion model, it achieves **20 FPS** on **5×H800** GPUs with **4-step** sampling and supports **Block-wise Autoregressive** processing for **10,000+** second streaming videos.
+> **TL;DR:** **Live Avatar** is an algorithm–system co-designed framework that enables real-time, streaming, infinite-length interactive avatar video generation. Powered by a **14B-parameter** diffusion model, it achieves **30+ FPS** on multi-card **H100** GPUs with **4-step** sampling and supports **Block-wise Autoregressive** processing for **10,000+** second streaming videos.
 
 <div align="center">
 
@@ -57,16 +57,17 @@
 ---
 ## ✨ Highlights
 
-> - ⚡ **​​Real-time Streaming Interaction**​​ - Achieve **20** FPS real-time streaming with low latency
+> - ⚡ **​​Real-time Streaming Interaction**​​ - Achieve **30+** FPS real-time streaming with low latency
 > - ♾️ ​​**​​Infinite-length Autoregressive Generation**​​​​ - Support **10,000+** second continuous video generation
 > - 🎨 ​​**​​Generalization Performances**​​​​ - Strong generalization across cartoon characters, singing, and diverse scenarios 
 
 
 ---
 ## 📰 News
-- **[2025.12.16]** 🎉 LiveAvatar has reached 1,000+ stars on GitHub! Thank you to the community for the incredible support! ⭐
-- **[2025.12.12]** 🚀 We released single-gpu inference [Code](infinite_inference_single_gpu.sh) — no need for 5×H100 (house-priced server), a single 80GB VRAM GPU is enough to enjoy. 
-- **[2025.12.08]** 🚀 We released real-time inference [Code](infinite_inference_multi_gpu.sh) and the model [Weight](https://huggingface.co/Quark-Vision/Live-Avatar).
+- **[2026.1.9]** 🚀 Major performance update! Inference speed boosted to **Peak 1.5x** and **Average 2x**, achieving stable **30+ FPS** on **multi-H100** setups. Fixed inference issues also bring noticeable **quality improvements**. A **quantized version** for **RTX 4090** real-time support is coming soon!
+- **[2025.12.16]** 🎉 LiveAvatar has reached **1,000+** stars on GitHub! Thank you to the community for the incredible support! ⭐
+- **[2025.12.12]** 🚀 We released **single-gpu** inference [Code](infinite_inference_single_gpu.sh) — no need for 5×H100 (house-priced server), a single 80GB VRAM GPU is enough to enjoy. 
+- **[2025.12.08]** 🚀 We released **real-time** inference [Code](infinite_inference_multi_gpu.sh) and the model [Weight](https://huggingface.co/Quark-Vision/Live-Avatar).
 - **[2025.12.08]** 🎉 LiveAvatar won the Hugging Face [#1 Paper of the day](https://huggingface.co/papers/date/2025-12-05)!
 - **[2025.12.04]** 🏃‍♂️ We committed to open-sourcing the code in **early December**.
 - **[2025.12.04]** 🔥 We released [Paper](https://arxiv.org/abs/2512.04677) and [demo page](https://liveavatar.github.io/) Website.
@@ -88,9 +89,10 @@
 ### ⚙️ **Later updates**
 
 - ✅ Inference code supporting single GPU (offline generation)
-- ✅ Further Speed up
+- ✅ Multi-character support
+- ✅ Inference Acceleration Stage1 (RoPE optimization, compilation, LoRA merge)
 - ✅ Streaming-VAE intergration
-- ⬜ Multi-character support
+- ⬜ Inference Acceleration Stage2 (further compilation, L8A8)
 - ⬜ UI integration for easily streaming interaction
 - ⬜ TTS integration
 - ⬜ Training code 
