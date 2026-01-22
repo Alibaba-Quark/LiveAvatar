@@ -39,7 +39,7 @@
 
 </div>
 
-> **TL;DR:** **Live Avatar** is an algorithm–system co-designed framework that enables real-time, streaming, infinite-length interactive avatar video generation. Powered by a **14B-parameter** diffusion model, it achieves **45 FPS** on multi-card **H100** GPUs with **4-step** sampling and supports **Block-wise Autoregressive** processing for **10,000+** second streaming videos.
+> **TL;DR:** **Live Avatar** is an algorithm–system co-designed framework that enables real-time, streaming, infinite-length interactive avatar video generation. Powered by a **14B-parameter** diffusion model, it achieves **45 FPS** on multi-card **H800** GPUs with **4-step** sampling and supports **Block-wise Autoregressive** processing for **10,000+** second streaming videos.
 
 <div align="center">
 
@@ -64,11 +64,11 @@
 
 ---
 ## 📰 News
-- **[2026.1.20]** 🚀 Another major performance breakthrough! **FP8 quantization** enables inference on **48GB GPUs**, while advanced **compilation** and **cuDNN** attention boost speed to **~2.5x** peak and **3x** average FPS. Achieving stable **45+ FPS** on multi-H100 — share your results on different GPUs!
-- **[2026.1.9]** 🚀 Major performance update! Inference speed boosted to Peak 1.5x and Average 2x, achieving stable 30+ FPS on multi-H100 setups. Fixed inference issues also bring noticeable **quality 
+- **[2026.1.20]** 🚀 Another major performance breakthrough! **FP8 quantization** enables inference on **48GB GPUs**, while advanced **compilation** and **cuDNN** attention boost speed to **~2.5x** peak and **3x** average FPS. Achieving stable **45+ FPS** on multi-H800 — share your results on different GPUs!
+- **[2026.1.9]** 🚀 Major performance update! Inference speed boosted to Peak 1.5x and Average 2x, achieving stable 30+ FPS on multi-H800 setups. Fixed inference issues also bring noticeable **quality 
 improvements**.
 - **[2025.12.16]** 🎉 LiveAvatar has reached **1,000+** stars on GitHub! Thank you to the community for the incredible support! ⭐
-- **[2025.12.12]** 🚀 We released **single-gpu** inference [Code](infinite_inference_single_gpu.sh) — no need for 5×H100 (house-priced server), a single 80GB VRAM GPU is enough to enjoy. 
+- **[2025.12.12]** 🚀 We released **single-gpu** inference [Code](infinite_inference_single_gpu.sh) — no need for 5×H800 (house-priced server), a single 80GB VRAM GPU is enough to enjoy. 
 - **[2025.12.08]** 🚀 We released **real-time** inference [Code](infinite_inference_multi_gpu.sh) and the model [Weight](https://huggingface.co/Quark-Vision/Live-Avatar).
 - **[2025.12.08]** 🎉 LiveAvatar won the Hugging Face [#1 Paper of the day](https://huggingface.co/papers/date/2025-12-05)!
 - **[2025.12.04]** 🏃‍♂️ We committed to open-sourcing the code in **early December**.
@@ -120,7 +120,7 @@ conda install -c nvidia/label/cuda-12.4.1 cudatoolkit -y
 ```bash
 pip install torch==2.8.0 torchvision==0.23.0 --index-url https://download.pytorch.org/whl/cu128
 
-# If you are using NVIDIA Hopper architecture (H100/H200, etc.), FlashAttention 3 is recommended for a significant speedup:
+# If you are using NVIDIA Hopper architecture (H800/H200, etc.), FlashAttention 3 is recommended for a significant speedup:
 pip install flash_attn_3 --find-links https://windreamer.github.io/flash-attention3-wheels/cu128_torch280 --extra-index-url https://download.pytorch.org/whl/cu128
 
 # Otherwise, use FlashAttention 2:
@@ -226,6 +226,12 @@ If you find this project useful for your research, please consider citing our pa
 * The majority of this project is released under the Apache 2.0 license as found in the [LICENSE](LICENSE).
 * The Wan model (Our base model) is also released under the Apache 2.0 license as found in the [LICENSE](https://github.com/Wan-Video/Wan2.2/blob/main/LICENSE.txt).
 * The project is a research preview. Please contact us if you find any potential violations. (jmliu1217@gmail.com)
+
+### 💬 WeChat Group
+
+<p align="center">
+  <img src="assets/wechat_group.png" alt="WeChat group" width="360" />
+</p>
 
 
 

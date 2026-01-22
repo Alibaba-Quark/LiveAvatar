@@ -23,6 +23,7 @@ Real*/
 tests/
 infinite_generate_test.sh
 streaming_output_test.py
+examples/liuwei2.png
 
 
 # C extensions
