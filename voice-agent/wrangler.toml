@@ -1,0 +1,11 @@
+name = "lynk-voice-agent"
+main = "worker.js"
+compatibility_date = "2024-12-01"
+
+# Serve the branded UI in ./public as static assets, with worker.js handling /session.
+[assets]
+directory = "./public"
+binding = "ASSETS"
+
+# Secret (do NOT put the key here). Set it with:
+#   npx wrangler secret put OPENAI_API_KEY
