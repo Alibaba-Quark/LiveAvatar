@@ -34,12 +34,45 @@ html, body {
 .sub { font-weight: 600; letter-spacing: .42em; font-size: .9rem; color: var(--green); margin-top: 6px; }
 .product { font-weight: 600; letter-spacing: .08em; font-size: 1rem; color: var(--muted); margin-top: 12px; }
 
+.cols {
+  display: flex;
+  gap: 40px;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
 .orb-wrap {
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 18px;
 }
+
+.avatar-toggle {
+  color: var(--muted);
+  font-size: .85rem;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+}
+
+.avatar-panel {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+}
+.avatar-panel video {
+  width: 320px;
+  height: 320px;
+  border-radius: 16px;
+  border: 1px solid var(--green-dim);
+  background: #000;
+  object-fit: cover;
+}
+.avatar-status { color: var(--muted); font-size: .85rem; margin: 0; }
 
 .orb {
   position: relative;

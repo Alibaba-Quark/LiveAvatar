@@ -2,10 +2,18 @@ name = "lynk-voice-agent"
 main = "worker.js"
 compatibility_date = "2024-12-01"
 
-# Serve the branded UI in ./public as static assets, with worker.js handling /session.
+# Serve the branded UI in ./public as static assets; worker.js handles /session + /generate.
 [assets]
 directory = "./public"
 binding = "ASSETS"
 
-# Secret (do NOT put the key here). Set it with:
-#   npx wrangler secret put OPENAI_API_KEY
+# Bundle knowledge.md as a text module so the Worker can import it.
+[[rules]]
+type = "Text"
+globs = ["**/*.md"]
+fallthrough = true
+
+# Secret (do NOT put the key here):  npx wrangler secret put OPENAI_API_KEY
+# Var (set when the avatar service is hosted):
+# [vars]
+# AVATAR_URL = "https://your-runpod-endpoint"

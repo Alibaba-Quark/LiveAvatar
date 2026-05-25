@@ -8,17 +8,73 @@ const orbLabel = document.getElementById("orbLabel");
 const statusLine = document.getElementById("statusLine");
 const transcript = document.getElementById("transcript");
 const assistantAudio = document.getElementById("assistantAudio");
+const avatarToggle = document.getElementById("avatarToggle");
+const avatarPanel = document.getElementById("avatarPanel");
+const avatarVideo = document.getElementById("avatarVideo");
+const avatarStatus = document.getElementById("avatarStatus");
 
 let pc = null;          // RTCPeerConnection
 let dc = null;          // data channel for events
 let micStream = null;
 let connected = false;
 
-// --- Phase 2 hook -----------------------------------------------------------
-// The assistant's spoken audio arrives as a remote MediaStream track. Capturing
-// it here is what will later drive the LiveAvatar talking-head video. We keep a
-// reference so a future avatar layer can tap it without re-architecting.
+// --- Avatar (Phase 2) -------------------------------------------------------
+// The assistant's spoken audio arrives as a remote MediaStream track. We record
+// each spoken turn and POST it to /generate, which returns a video. Locally the
+// avatar service is in MOCK mode (placeholder clip); the same call hits the real
+// GPU model once /generate is pointed at RunPod — no client change needed.
 let assistantStream = null;
+let recorder = null;
+let recordedChunks = [];
+
+function avatarEnabled() {
+  return avatarToggle.checked;
+}
+
+function startTurnRecording() {
+  if (!avatarEnabled() || !assistantStream || recorder) return;
+  recordedChunks = [];
+  try {
+    recorder = new MediaRecorder(assistantStream);
+  } catch (e) {
+    console.warn("MediaRecorder unsupported:", e);
+    return;
+  }
+  recorder.ondataavailable = (e) => { if (e.data.size) recordedChunks.push(e.data); };
+  recorder.onstop = sendTurnToAvatar;
+  recorder.start();
+}
+
+function stopTurnRecording() {
+  if (recorder && recorder.state !== "inactive") recorder.stop();
+}
+
+async function sendTurnToAvatar() {
+  const r = recorder;
+  recorder = null;
+  if (!avatarEnabled() || !recordedChunks.length) return;
+  const blob = new Blob(recordedChunks, { type: "audio/webm" });
+  recordedChunks = [];
+  avatarStatus.textContent = "Generating avatar…";
+  try {
+    const form = new FormData();
+    form.append("audio", blob, "turn.webm");
+    form.append("image", "default");
+    const resp = await fetch("/generate", { method: "POST", body: form });
+    if (!resp.ok) throw new Error(`avatar /generate ${resp.status}`);
+    const videoBlob = await resp.blob();
+    avatarVideo.src = URL.createObjectURL(videoBlob);
+    avatarVideo.play().catch(() => {});
+    avatarStatus.textContent = "Avatar ready";
+  } catch (err) {
+    console.error(err);
+    avatarStatus.textContent = `Avatar error: ${err.message}`;
+  }
+}
+
+avatarToggle.addEventListener("change", () => {
+  avatarPanel.hidden = !avatarToggle.checked;
+});
 // ---------------------------------------------------------------------------
 
 function setState(state, label) {
@@ -115,13 +171,19 @@ function onServerEvent(e) {
       currentAssistantBubble = null;
       break;
 
-    // Speaking-state visuals.
+    // Speaking-state visuals + per-turn avatar capture.
     case "output_audio_buffer.started":
+      setState("speaking", "Speaking…");
+      startTurnRecording();
+      break;
     case "response.audio.delta":
       setState("speaking", "Speaking…");
       break;
-    case "response.audio.done":
     case "output_audio_buffer.stopped":
+      stopTurnRecording();
+      if (connected) setState("live", "Listening…");
+      break;
+    case "response.audio.done":
     case "response.done":
       if (connected) setState("live", "Listening…");
       break;

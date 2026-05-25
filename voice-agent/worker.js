@@ -1,71 +1,47 @@
-// LYNK & CO JORDAN — Voice Concierge (Cloudflare Worker)
+// LYNK & CO JORDAN — Voice Concierge (Cloudflare Worker, PRODUCTION hosting)
 //
-// Two jobs:
-//   1. POST /session  -> mint a short-lived OpenAI Realtime token configured
-//                        with the Lynk & Co persona + knowledge. The real API
-//                        key (env.OPENAI_API_KEY, set as a secret) never leaves
-//                        the server.
-//   2. everything else -> serve the static branded UI from /public.
+// For LOCAL development use local-dev/ (docker-compose) instead — it mirrors this
+// Worker with a Python gateway so the whole system runs on your machine.
 //
-// Set the secret once:  npx wrangler secret put OPENAI_API_KEY
+// Jobs:
+//   1. POST /session  -> mint a short-lived OpenAI Realtime token (API key stays
+//                        server-side). Persona + knowledge.md injected.
+//   2. POST /generate -> proxy to the avatar service (env.AVATAR_URL) once you
+//                        host one. Until then this returns 503.
+//   3. everything else -> serve the static branded UI from /public.
+//
+// Secrets:  npx wrangler secret put OPENAI_API_KEY
+// Vars:     set AVATAR_URL (your RunPod avatar endpoint) when Phase 2 is live.
 
-// Realtime model. Bump this string as OpenAI ships newer realtime models.
-const REALTIME_MODEL = "gpt-4o-realtime-preview";
+// knowledge.md is bundled as text (see the [[rules]] Text entry in wrangler.toml).
+import KNOWLEDGE from "./knowledge.md";
 
-// Voice. OpenAI realtime voices: alloy, ash, ballad, coral, echo, sage, shimmer, verse.
-// Test which sounds best for Arabic + English at your booth.
-const VOICE = "verse";
+const REALTIME_MODEL = "gpt-4o-realtime-preview"; // bump as newer realtime models ship
+const VOICE = "verse"; // try voices for best Arabic + English sound
 
-// ===========================================================================
-// LYNK & CO JORDAN KNOWLEDGE BASE  —  EDIT THIS.
-// IMPORTANT: replace the placeholders with OFFICIAL Jordan-market data before
-// the event. The agent is instructed to ONLY use facts found here and to never
-// invent specs or prices. Anything you leave vague, it will decline to answer
-// and offer a representative instead.
-// ===========================================================================
-const KNOWLEDGE = `
-LYNK & CO — BRAND
-- Lynk & Co is a premium connected-mobility brand offering hybrid and electric vehicles.
-- Positioning: modern, design-led, urban, connected. (Confirm exact brand lines for Jordan.)
-
-LYNK & CO JORDAN — MODELS AVAILABLE (REPLACE WITH OFFICIAL LINEUP)
-- [MODEL NAME]: [bodystyle], [powertrain: hybrid/PHEV/EV], [headline feature]. Price: [VERIFY].
-- [MODEL NAME]: [bodystyle], [powertrain], [headline feature]. Price: [VERIFY].
-- [MODEL NAME]: [bodystyle], [powertrain], [headline feature]. Price: [VERIFY].
-
-KEY SELLING POINTS (REPLACE/CONFIRM)
-- [e.g. range, charging time, safety rating, connectivity / app features]
-
-DEALER / NEXT STEPS (REPLACE)
-- Showroom location: [ADDRESS]
-- Test drive / booking: [HOW]
-- Contact for follow-up: [PHONE / WEBSITE]
-`;
-
-const INSTRUCTIONS = `You are the voice concierge for Lynk & Co Jordan at a premium brand event.
+function buildInstructions() {
+  return `You are the voice concierge for Lynk & Co Jordan at a premium brand event.
 
 PERSONA
-- Warm, confident, concise, and premium — like a knowledgeable brand host.
-- You are speaking out loud at a live booth, so keep replies short and natural
-  (1-3 sentences). Invite a follow-up question rather than monologuing.
+- Warm, confident, concise, premium — a knowledgeable brand host.
+- You speak out loud at a live booth: keep replies short and natural (1-3
+  sentences) and invite a follow-up rather than monologuing.
 
 LANGUAGE
-- Auto-detect the guest's language. If they speak Arabic, reply in natural
-  spoken Arabic. If they speak English, reply in English. Mirror their language
-  and switch if they switch.
+- Auto-detect the guest's language. Reply in natural spoken Arabic if they speak
+  Arabic, English if they speak English. Mirror them and switch if they switch.
 
 SCOPE & ACCURACY (critical)
-- Answer questions about Lynk & Co vehicles using ONLY the facts in the
-  KNOWLEDGE section below.
-- NEVER invent or guess specs, prices, availability, or dates. If you do not
-  have a fact, say so briefly and offer to connect them with a representative
-  or point them to the showroom.
-- Do not discuss competitors' specifics or make comparative claims you cannot
-  support from the knowledge.
+- Answer using ONLY the facts in the KNOWLEDGE section.
+- NEVER invent or guess specs, prices, availability, or dates. If you lack a
+  fact, say so briefly and offer to connect them with a representative or point
+  them to the showroom.
+- Avoid comparative claims about competitors you cannot support from KNOWLEDGE.
 
 KNOWLEDGE
 ${KNOWLEDGE}
 `;
+}
 
 async function mintSession(env) {
   const resp = await fetch("https://api.openai.com/v1/realtime/sessions", {
@@ -77,7 +53,7 @@ async function mintSession(env) {
     body: JSON.stringify({
       model: REALTIME_MODEL,
       voice: VOICE,
-      instructions: INSTRUCTIONS,
+      instructions: buildInstructions(),
       input_audio_transcription: { model: "whisper-1" },
       turn_detection: { type: "server_vad" },
     }),
@@ -89,8 +65,7 @@ async function mintSession(env) {
   }
 
   const session = await resp.json();
-  // Tell the client which model to use in its WebRTC URL.
-  session.model = REALTIME_MODEL;
+  session.model = REALTIME_MODEL; // client needs this for the WebRTC URL
   return new Response(JSON.stringify(session), {
     headers: { "Content-Type": "application/json" },
   });
@@ -107,7 +82,17 @@ export default {
       return mintSession(env);
     }
 
-    // Serve static assets (the branded UI).
+    if (url.pathname === "/generate" && request.method === "POST") {
+      if (!env.AVATAR_URL) {
+        return new Response("Avatar service not configured (set AVATAR_URL)", { status: 503 });
+      }
+      return fetch(`${env.AVATAR_URL.replace(/\/$/, "")}/generate`, {
+        method: "POST",
+        body: request.body,
+        headers: request.headers,
+      });
+    }
+
     return env.ASSETS.fetch(request);
   },
 };
