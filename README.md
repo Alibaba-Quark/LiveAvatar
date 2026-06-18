@@ -68,6 +68,7 @@
 
 ---
 ## 📰 News
+- **[2026.6.18]** 🎉 LiveAvatar has been accepted by **ECCV 2026**! 🥳
 - **[2026.1.20]** 🚀 Major performance breakthrough (**v1.1**)! **FP8 quantization** enables inference on **48GB GPUs**, while advanced **compilation** and **cuDNN** attention boost speed to **~2.5x** peak and **3x** average FPS. Achieving stable **45+ FPS** on multi-H800 — share your results on different GPUs! Inference fixes also bring noticeable **quality improvements**, significantly surpassing the teacher model on qualitative metrics.
 <!-- - **[2026.1.9]** 🚀 Major performance update! Inference speed boosted to Peak 1.5x and Average 2x, achieving stable 30+ FPS on multi-H800 setups.  -->
 - **[2025.12.16]** 🎉 LiveAvatar has reached **1,000+** stars on GitHub! Thank you to the community for the incredible support! ⭐
