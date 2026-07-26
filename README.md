@@ -4,7 +4,7 @@
   <img src="./assets/logo.png" width="200px" alt="Live Avatar Teaser">
 </p>
 
-<h1>🎬 Live Avatar: Streaming Real-time Audio-Driven Avatar Generation with Infinite Length</h1>
+<h1>(ECCV26 Oral) 🎬 Live Avatar: Streaming Real-time Audio-Driven Avatar Generation with Infinite Length</h1>
 <!-- <h3>The code will be open source in <strong><span style="color: #87CEEB;">early December</span></strong>.</h3> -->
 
 
