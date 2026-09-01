@@ -10,6 +10,19 @@ sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 warnings.filterwarnings('ignore')
 
+# ---------------------------------------------------------------------------
+# Brand: Lynk & Co Jordan
+# Edit these to re-skin the UI. Colors follow the Lynk & Co identity:
+# black background, white text, vivid green accent.
+# ---------------------------------------------------------------------------
+BRAND_NAME = "LYNK & CO"
+BRAND_SUB = "JORDAN"
+BRAND_PRODUCT = "Avatar Studio"
+BRAND_TAGLINE = "Audio-driven avatar generation — a connected guest experience."
+BRAND_GREEN = "#00E676"
+BRAND_BLACK = "#0A0A0A"
+BRAND_FOOTER = "Lynk & Co Jordan · Avatar Studio"
+
 import random
 import gradio as gr
 import torch
@@ -501,7 +514,7 @@ def reload_pipeline_command(use_lora, lora_path):
         dist.broadcast_object_list(idle_signal, src=0)
         logging.info(f"[Rank 0] Sent idle signal after reload")
         
-    return "模型重新加载成功 / Pipeline reloaded successfully!"
+    return "Pipeline reloaded successfully!"
 
 
 def _run_inference_computation(prompt, image_path, audio_path, num_clip,
@@ -626,27 +639,64 @@ def create_gradio_interface():
     Create Gradio web interface
     Only called on rank 0
     """
-    with gr.Blocks(title="LiveAvatar Video Generation") as demo:
-        gr.Markdown("# LiveAvatar 视频生成 Web UI / LiveAvatar Video Generation Web UI")
-        gr.Markdown("上传参考图像、音频和提示词来生成说话人视频 / Upload reference image, audio and prompt to generate talking avatar video")
+    brand_theme = gr.themes.Base(
+        primary_hue=gr.themes.colors.green,
+        neutral_hue=gr.themes.colors.gray,
+        font=[gr.themes.GoogleFont("Inter"), "system-ui", "sans-serif"],
+    ).set(
+        body_background_fill=BRAND_BLACK,
+        body_background_fill_dark=BRAND_BLACK,
+        body_text_color="#FFFFFF",
+        background_fill_primary="#141414",
+        background_fill_secondary="#1C1C1C",
+        block_background_fill="#141414",
+        block_border_color="#2A2A2A",
+        block_label_text_color=BRAND_GREEN,
+        border_color_primary="#2A2A2A",
+        button_primary_background_fill=BRAND_GREEN,
+        button_primary_background_fill_hover="#00C853",
+        button_primary_text_color="#000000",
+        input_background_fill="#1C1C1C",
+    )
+
+    brand_css = f"""
+    .lc-header {{ text-align:center; padding: 28px 0 8px; }}
+    .lc-logo {{ font-weight:800; letter-spacing:.18em; font-size:2.4rem; color:#FFFFFF; line-height:1; }}
+    .lc-logo .amp {{ color:{BRAND_GREEN}; }}
+    .lc-sub {{ font-weight:600; letter-spacing:.42em; font-size:.95rem; color:{BRAND_GREEN}; margin-top:6px; }}
+    .lc-product {{ font-weight:700; letter-spacing:.06em; font-size:1.15rem; color:#FFFFFF; margin-top:14px; }}
+    .lc-tagline {{ color:#A0A0A0; font-size:.95rem; margin-top:4px; }}
+    .lc-footer {{ text-align:center; color:#6E6E6E; font-size:.8rem; padding:24px 0 12px; border-top:1px solid #2A2A2A; margin-top:24px; }}
+    .lc-footer .amp {{ color:{BRAND_GREEN}; }}
+    """
+
+    with gr.Blocks(title=f"{BRAND_NAME} {BRAND_SUB} — {BRAND_PRODUCT}", theme=brand_theme, css=brand_css) as demo:
+        gr.HTML(f"""
+        <div class="lc-header">
+          <div class="lc-logo">LYNK <span class="amp">&amp;</span> CO</div>
+          <div class="lc-sub">{BRAND_SUB}</div>
+          <div class="lc-product">{BRAND_PRODUCT}</div>
+          <div class="lc-tagline">{BRAND_TAGLINE}</div>
+        </div>
+        """)
         
         with gr.Row():
             with gr.Column():
-                gr.Markdown("### 基础输入 / Basic Input")
+                gr.Markdown("### Basic Input")
                 prompt_input = gr.Textbox(
-                    label="提示词 / Prompt",
-                    placeholder="描述你想生成的视频内容 / Describe the video content you want to generate...",
+                    label="Prompt",
+                    placeholder="Describe the video content you want to generate...",
                     value=EXAMPLE_PROMPT["s2v-14B"]["prompt"],
                     lines=5
                 )
-                
+
                 # Image input with gallery
                 image_input = gr.Image(
-                    label="参考图像 / Reference Image",
+                    label="Reference Image",
                     type="filepath"
                 )
-                
-                gr.Markdown("**示例图片 (点击选择) / Example Images (Click to Select):**")
+
+                gr.Markdown("**Example Images (click to select):**")
                 example_gallery = gr.Gallery(
                     value=[img_path for img_path, label in EXAMPLE_IMAGES if os.path.exists(img_path)],
                     label="",
@@ -659,91 +709,91 @@ def create_gradio_interface():
                 
                 # Audio input with examples
                 audio_input = gr.Audio(
-                    label="音频文件 / Audio File",
+                    label="Audio File",
                     type="filepath"
                 )
-                
+
                 example_audio_dropdown = gr.Dropdown(
                     choices=[(label, audio_path) for audio_path, label in EXAMPLE_AUDIOS if os.path.exists(audio_path)],
-                    label="示例音频 (选择后自动填充) / Example Audio (Auto-fill on Selection)",
+                    label="Example Audio (auto-fill on selection)",
                     show_label=True,
                     value=None
                 )
-                
-                with gr.Accordion("高级参数 / Advanced Parameters", open=False):
-                    gr.Markdown("### 生成参数 / Generation Parameters")
+
+                with gr.Accordion("Advanced Parameters", open=False):
+                    gr.Markdown("### Generation Parameters")
                     with gr.Row():
                         num_clip_input = gr.Slider(
                             minimum=1,
                             maximum=10000,
                             value=global_args.num_clip,
                             step=1,
-                            label="生成片段数量 / Number of Clips"
+                            label="Number of Clips"
                         )
                         sample_steps_input = gr.Slider(
                             minimum=1,
                             maximum=50,
                             value=global_args.sample_steps,
                             step=1,
-                            label="采样步数 / Sampling Steps"
+                            label="Sampling Steps"
                         )
-                    
+
                     with gr.Row():
                         sample_guide_scale_input = gr.Slider(
                             minimum=0.0,
                             maximum=10.0,
                             value=global_args.sample_guide_scale,
                             step=0.1,
-                            label="引导尺度 / Guidance Scale"
+                            label="Guidance Scale"
                         )
                         infer_frames_input = gr.Slider(
                             minimum=16,
                             maximum=160,
                             value=global_args.infer_frames,
                             step=4,
-                            label="每片段帧数 / Frames per Clip"
+                            label="Frames per Clip"
                         )
-                    
+
                     with gr.Row():
                         size_input = gr.Dropdown(
                             choices=list(SIZE_CONFIGS.keys()),
                             value=global_args.size,
-                            label="视频尺寸 / Video Size"
+                            label="Video Size"
                         )
                         base_seed_input = gr.Number(
                             value=global_args.base_seed,
-                            label="随机种子 / Random Seed",
+                            label="Random Seed",
                             precision=0
                         )
-                    
+
                     sample_solver_input = gr.Dropdown(
                         choices=['euler', 'unipc', 'dpm++'],
                         value=global_args.sample_solver,
-                        label="采样器 / Sampler"
+                        label="Sampler"
                     )
 
-                with gr.Accordion("LoRA 设置 / LoRA Settings", open=False):
-                    gr.Markdown("### LoRA 权重 / LoRA Weights")
+                with gr.Accordion("LoRA Settings", open=False):
+                    gr.Markdown("### LoRA Weights")
                     use_lora_checkbox = gr.Checkbox(
-                        label="启用 LoRA / Enable LoRA", 
+                        label="Enable LoRA",
                         value=global_args.load_lora
                     )
                     lora_path_input = gr.Textbox(
-                        label="LoRA 路径 / LoRA Path", 
-                        placeholder="输入 LoRA 权重的本地路径 / Enter local path to LoRA weights",
+                        label="LoRA Path",
+                        placeholder="Enter local path to LoRA weights",
                         value=global_args.lora_path_dmd or ""
                     )
-                    reload_pipe_btn = gr.Button("🔄 重新加载模型 (应用 LoRA) / Reload Pipeline (Apply LoRA)", variant="secondary")
-                
-                generate_btn = gr.Button("🎬 开始生成 / Start Generation", variant="primary", size="lg")
-            
+                    reload_pipe_btn = gr.Button("Reload Pipeline (Apply LoRA)", variant="secondary")
+
+                generate_btn = gr.Button("Generate", variant="primary", size="lg")
+
             with gr.Column():
-                gr.Markdown("### 生成结果 / Generation Result")
-                video_output = gr.Video(label="生成的视频 / Generated Video")
-                status_output = gr.Textbox(label="状态信息 / Status", lines=3)
+                gr.Markdown("### Generation Result")
+                video_output = gr.Video(label="Generated Video")
+                status_output = gr.Textbox(label="Status", lines=3)
         
         # Add example combinations
-        gr.Markdown("### 📌 快速示例 / Quick Examples")
+        gr.Markdown("### Quick Examples")
         gr.Examples(
             examples=[
                 [
@@ -779,31 +829,32 @@ def create_gradio_interface():
             examples_per_page=2
         )
         
-        gr.Markdown("""
+        gr.HTML(f"""
+        <div class="lc-footer">LYNK <span class="amp">&amp;</span> CO {BRAND_SUB} · {BRAND_PRODUCT}</div>
         """)
-        
-        def generate_wrapper(prompt, image, audio, num_clip, sample_steps, 
+
+        def generate_wrapper(prompt, image, audio, num_clip, sample_steps,
                            sample_guide_scale, infer_frames, size, base_seed, sample_solver):
             """Wrapper function for Gradio interface"""
             if not prompt or not image or not audio:
-                return None, "错误 / Error: 请提供所有必需的输入 (提示词、图像、音频) / Please provide all required inputs (prompt, image, audio)"
-            
+                return None, "Error: Please provide all required inputs (prompt, image, audio)"
+
             try:
-                status = f"正在生成视频 / Generating video...\n参数 / Parameters: steps={sample_steps}, clips={num_clip}, frames={infer_frames}"
+                status = f"Generating video...\nParameters: steps={sample_steps}, clips={num_clip}, frames={infer_frames}"
                 video_path = run_single_sample(
                     prompt, image, audio, num_clip,
                     sample_steps, sample_guide_scale, infer_frames,
                     size, int(base_seed), sample_solver
                 )
-                
+
                 if video_path and os.path.exists(video_path):
-                    status = f"✅ 生成成功 / Generation Successful!\n视频保存在 / Video saved at: {video_path}"
+                    status = f"Generation successful!\nVideo saved at: {video_path}"
                     return video_path, status
                 else:
-                    status = "❌ 生成失败，请查看日志 / Generation failed, please check logs"
+                    status = "Generation failed, please check logs"
                     return None, status
             except Exception as e:
-                status = f"❌ 错误 / Error: {str(e)}"
+                status = f"Error: {str(e)}"
                 return None, status
         
         def reload_wrapper(use_lora, lora_path):

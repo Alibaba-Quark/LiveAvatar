@@ -1,0 +1,31 @@
+# Local-first stack for the Lynk & Co Jordan experience.
+# Runs the WHOLE system on your machine (no GPU): real voice agent + mock avatar.
+#
+#   1. export OPENAI_API_KEY=sk-...      (or put it in local-dev/.env)
+#   2. docker compose -f local-dev/docker-compose.yml up --build
+#   3. open http://localhost:8080
+#
+# To go live later, set MODE=runpod + RUNPOD_URL on the avatar service.
+
+services:
+  gateway:
+    build: ./gateway
+    ports:
+      - "8080:8080"
+    environment:
+      OPENAI_API_KEY: ${OPENAI_API_KEY:-}
+      AVATAR_URL: http://avatar:8000
+      VOICE_AGENT_DIR: /srv/voice-agent
+    volumes:
+      # Mount the voice-agent so the gateway serves the UI and reads knowledge.md.
+      - ../voice-agent:/srv/voice-agent:ro
+    depends_on:
+      - avatar
+
+  avatar:
+    build: ../avatar-service
+    ports:
+      - "8000:8000"
+    environment:
+      MODE: ${AVATAR_MODE:-mock}
+      RUNPOD_URL: ${RUNPOD_URL:-}
